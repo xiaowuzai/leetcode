@@ -1,5 +1,7 @@
 package main
 
+import "container/list"
+
 /**
  * Definition for a binary tree node.
  * type TreeNode struct {
@@ -13,28 +15,53 @@ func isSymmetric(root *TreeNode) bool {
 		return true
 	}
 
-	var dfs func(root *TreeNode) []int
-	dfs = func(root *TreeNode) []int{
-		res := make([]int, 0)
-		if root == nil {
-			return res
-		}
+	queue := list.New()
+	queue.PushBack(root.Left)
+	queue.PushBack(root.Right)
+	for queue.Len() != 0 {
+		left := queue.Remove(queue.Front()).(*TreeNode)
+		right := queue.Remove(queue.Front()).(*TreeNode)
 
-		res = append(res, dfs(root.Left)...)
-		res = append(res, root.Val)
-		res = append(res, dfs(root.Right)...)
-		return res
-	}
-
-	data := dfs(root)
-	
-	n := len(data)
-	mid := n/2
-	for i := 0; i < mid; i++ {
-		if data[mid-i] != data[mid+i] {
+		if left ==nil && right == nil {
+			continue
+		}else if left == nil || right == nil {
+			return false
+		}else if left.Val != right.Val {
 			return false
 		}
+
+		queue.PushBack(left.Left)
+		queue.PushBack(right.Right)
+
+		queue.PushBack(left.Right)
+		queue.PushBack(right.Left)
 	}
+
 	return true
 }
 
+
+
+func isSymmetric_1(root *TreeNode) bool {
+	if root == nil {
+		return false
+	}
+	return isMirror(root.Left, root.Right)
+}
+
+func isMirror(left, right *TreeNode) bool {
+	if left == nil && right == nil {
+		return true
+	}
+
+	if left == nil || right == nil {
+		return false
+	}
+
+	if left.Val != right.Val {
+		return false
+	}
+
+	return isMirror(left.Left, right.Right) && isMirror(left.Right, right.Left)
+
+}
